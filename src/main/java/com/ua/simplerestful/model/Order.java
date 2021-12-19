@@ -7,6 +7,7 @@ public class Order {
 
     private Integer id;
     private final Map<Integer, Item> items = new HashMap<>();
+    private Double total = 0.0;
 
     public Integer getId() {
         return id;
@@ -26,5 +27,9 @@ public class Order {
 
     public boolean removeItem(Integer item_id) {
         return items.remove(item_id) != null;
+    }
+
+    public void recountTotal() {
+        items.forEach((id, item) -> total += item.getPrice());
     }
 }

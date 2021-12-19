@@ -29,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
     public void create(Integer client_id, Order order) {
         final int id = ORDER_ID_HOLDER.incrementAndGet();
         order.setId(id);
+        order.recountTotal();
         ORDERS_REPOSITORY_MAP.put(client_id, order);
     }
 
@@ -60,11 +61,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void addToOrder(Integer client_id, Integer item_id) {
         final Item item = itemService.read(item_id);
-        ORDERS_REPOSITORY_MAP.get(client_id).addItem(item);
+        final Order order = ORDERS_REPOSITORY_MAP.get(client_id);
+        order.addItem(item);
+        order.recountTotal();
     }
 
     @Override
     public boolean deleteItem(Integer client_id, Integer item_id) {
-        return ORDERS_REPOSITORY_MAP.get(client_id).removeItem(item_id);
+        if (ORDERS_REPOSITORY_MAP.get(client_id).removeItem(item_id)) {
+            ORDERS_REPOSITORY_MAP.get(client_id).recountTotal();
+            return true;
+        } else
+            return false;
     }
 }
